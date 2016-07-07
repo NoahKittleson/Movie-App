@@ -9,6 +9,9 @@ package com.example.guest.movieapp;
 import android.provider.SyncStateContract;
 import android.util.Log;
 
+import com.example.guest.movieapp.Constants;
+import com.example.guest.movieapp.Preview;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,6 +43,7 @@ public class MovieDatabaseService {
 //        String url = urlBuilder.build().toString();
 
         String APICall = "https://api.themoviedb.org/3/search/movie?query=" + title + "&api_key=" + Constants.apiKey;
+        Log.d("MOVIEDBSERVIE", APICall);
 
         Request request = new Request.Builder()
                 .url(APICall)
@@ -51,21 +55,34 @@ public class MovieDatabaseService {
         //Log.d("something", APICall);
     }
 
-    public static ArrayList<Movie> processResults(Response response) {
-        ArrayList<Movie> movies = new ArrayList<>();
+    public static ArrayList<Preview> processResults(Response response) {
+        ArrayList<Preview> previews = new ArrayList<>();
 
         try {
             String jsonData = response.body().string();
-            Log.d("MOVIE DATABASE SERVICE", jsonData);
 
             if (response.isSuccessful()) {
-                JSONArray movieJSON = new JSONObject(jsonData).getJSONArray("list");
+                JSONObject resultsJSON = new JSONObject(jsonData);
+                JSONArray movieJSON = resultsJSON.getJSONArray("results");
 
                 for (int i = 0; i < movieJSON.length(); i++) {
-                    String desc = movieJSON.getJSONObject(i).getJSONArray("movie").getJSONObject(0).getString("description");
+                    JSONObject filmJSON = movieJSON.getJSONObject(i);
+                    String title = filmJSON.getString("title");
+                    Log.d("MOVIEDBSERVIE", title + "");
+                    String date = filmJSON.getString("release_date");
+                    Log.d("MOVIEDBSERVIE", date + "");
+                    int id = filmJSON.getInt("id");
+                    Log.d("MOVIEDBSERVIE", id + "");
+                    double rating = 0.0;//filmJSON.getDouble("rating");
+                    Log.d("MOVIEDBSERVIE", rating + "");
 
-                    Movie movie = new Movie(desc);
-                    movies.add(movie);
+                    Preview preview = new Preview(title, date, rating, id);
+                    previews.add(preview);
+
+                    Log.d("MOVIEDBSERVIE", previews.get(i).getTitle() + "");
+                    Log.d("MOVIEDBSERVIE", previews.get(i).getDate() + "");
+                    Log.d("MOVIEDBSERVIE", previews.get(i).getId() + "");
+                    Log.d("MOVIEDBSERVIE", previews.get(i).getRating() + "");
                 }
             }
         } catch (IOException e) {
@@ -73,10 +90,6 @@ public class MovieDatabaseService {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        //Log.d("MOVIE DATABASE SERVICE", jsonData);
-        for (int i = 0; i < movies.size(); i++) {
-            Log.d("MOVIE DATABASE SERVICE", movies.get(i).getTitle());
-        }
-        return movies;
+        return previews;
     }
 }

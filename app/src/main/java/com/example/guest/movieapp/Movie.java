@@ -5,8 +5,13 @@ package com.example.guest.movieapp;
  */
 public class Movie {
     private String mTitle;
+    private String mDirector;
+    private String mSynopsis;
+    private String mPoster;
+    private String[] mActors;
+    private double mRating;
 
-    public Movie(String title) {
+    public Movie(String title, String director, String synopsis, String poster, double rating) {
         this.mTitle = title;
     }
 

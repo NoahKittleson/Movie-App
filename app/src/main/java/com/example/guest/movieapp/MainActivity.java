@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.example.guest.movieapp.R;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
@@ -26,7 +28,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View view) {
         if(view == mTitleButton) {
-            Log.v("whatever", "watever");
             String title = mTitleEditText.getText().toString();
             Intent titleIntent = new Intent(MainActivity.this, ResultsActivity.class);
             titleIntent.putExtra("title", title);

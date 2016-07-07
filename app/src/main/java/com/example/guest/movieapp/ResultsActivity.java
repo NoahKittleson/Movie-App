@@ -1,13 +1,19 @@
 package com.example.guest.movieapp;
-
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.TextView;
-import java.io.IOException;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.widget.TextView;
+
+import com.example.guest.movieapp.R;
+import com.example.guest.movieapp.PreviewListAdapter;
+import com.example.guest.movieapp.Preview;
+import com.example.guest.movieapp.MovieDatabaseService;
+
+import java.io.IOException;
+import java.util.ArrayList;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -18,8 +24,9 @@ import okhttp3.Response;
 
 
 public class ResultsActivity extends AppCompatActivity {
-    @Bind(R.id.textView2) TextView mTextView2;
-    public ArrayList<Movie> mMovies = new ArrayList<>();
+    public ArrayList<Preview> mPreviews = new ArrayList<>();
+    private PreviewListAdapter mAdapter;
+    @Bind(R.id.recyclerView) RecyclerView mRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +36,6 @@ public class ResultsActivity extends AppCompatActivity {
 
         Intent titleIntent = getIntent();
         String title = titleIntent.getStringExtra("title");
-        mTextView2.setText(title);
         getMovie(title);
     }
 
@@ -37,6 +43,7 @@ public class ResultsActivity extends AppCompatActivity {
         final MovieDatabaseService movieDatabaseService = new MovieDatabaseService();
 
         movieDatabaseService.findMovie(title, new Callback() {
+
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
@@ -44,16 +51,18 @@ public class ResultsActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(Call call, Response response) {
-                mMovies = MovieDatabaseService.processResults(response);
+                mPreviews = MovieDatabaseService.processResults(response);
 
                 ResultsActivity.this.runOnUiThread(new Runnable() {
+
                     @Override
                     public void run() {
-//                        mAdapter = new MovieListAdapter(getApplicationContext(), mMovies);
-//                        mRecyclerView.setAdapter(mAdapter);
-//                        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(ResultsActivity.this);
-//                        mRecyclerView.setLayoutManager(layoutManager);
-//                        mRecyclerView.setHasFixed(true);
+                        Log.d("Results Activity: ", mPreviews.size() + "");
+                        mAdapter = new PreviewListAdapter(getApplicationContext(), mPreviews);
+                        mRecyclerView.setAdapter(mAdapter);
+                        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(ResultsActivity.this);
+                        mRecyclerView.setLayoutManager(layoutManager);
+                        mRecyclerView.setHasFixedSize(true);
                     }
                 });
             }
