@@ -5,12 +5,6 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.widget.TextView;
-
-import com.example.guest.movieapp.R;
-import com.example.guest.movieapp.PreviewListAdapter;
-import com.example.guest.movieapp.Preview;
-import com.example.guest.movieapp.MovieDatabaseService;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,8 +18,8 @@ import okhttp3.Response;
 
 
 public class ResultsActivity extends AppCompatActivity {
-    public ArrayList<Preview> mPreviews = new ArrayList<>();
-    private PreviewListAdapter mAdapter;
+    public ArrayList<Movie> mMovies = new ArrayList<>();
+    private MovieListAdapter mAdapter;
     @Bind(R.id.recyclerView) RecyclerView mRecyclerView;
 
     @Override
@@ -33,10 +27,16 @@ public class ResultsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_results);
         ButterKnife.bind(this);
+        Intent intent = getIntent();
+        String title = intent.getStringExtra("title");
 
-        Intent titleIntent = getIntent();
-        String title = titleIntent.getStringExtra("title");
-        getMovie(title);
+        if (title.equals("recent")) {
+            getRecentMovie();
+        } else if (title.equals("rating")) {
+            getRatedMovie();
+        } else {
+            getMovie(title);
+        }
     }
 
     private void getMovie(String title) {
@@ -51,14 +51,74 @@ public class ResultsActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(Call call, Response response) {
-                mPreviews = MovieDatabaseService.processResults(response);
+                mMovies = MovieDatabaseService.processResults(response);
 
                 ResultsActivity.this.runOnUiThread(new Runnable() {
 
                     @Override
                     public void run() {
-                        Log.d("Results Activity: ", mPreviews.size() + "");
-                        mAdapter = new PreviewListAdapter(getApplicationContext(), mPreviews);
+                        Log.d("Results Activity: ", mMovies.size() + "");
+                        mAdapter = new MovieListAdapter(getApplicationContext(), mMovies);
+                        mRecyclerView.setAdapter(mAdapter);
+                        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(ResultsActivity.this);
+                        mRecyclerView.setLayoutManager(layoutManager);
+                        mRecyclerView.setHasFixedSize(true);
+                    }
+                });
+            }
+        });
+    }
+
+    private void getRatedMovie() {
+        final MovieDatabaseService movieDatabaseService = new MovieDatabaseService();
+
+        movieDatabaseService.ratedMovie(new Callback() {
+
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) {
+                mMovies = MovieDatabaseService.processResults(response);
+
+                ResultsActivity.this.runOnUiThread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        Log.d("Results Activity: ", mMovies.size() + "");
+                        mAdapter = new MovieListAdapter(getApplicationContext(), mMovies);
+                        mRecyclerView.setAdapter(mAdapter);
+                        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(ResultsActivity.this);
+                        mRecyclerView.setLayoutManager(layoutManager);
+                        mRecyclerView.setHasFixedSize(true);
+                    }
+                });
+            }
+        });
+    }
+
+    private void getRecentMovie() {
+        final MovieDatabaseService movieDatabaseService = new MovieDatabaseService();
+
+        movieDatabaseService.recentMovie(new Callback() {
+
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) {
+                mMovies = MovieDatabaseService.processResults(response);
+
+                ResultsActivity.this.runOnUiThread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        Log.d("Results Activity: ", mMovies.size() + "");
+                        mAdapter = new MovieListAdapter(getApplicationContext(), mMovies);
                         mRecyclerView.setAdapter(mAdapter);
                         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(ResultsActivity.this);
                         mRecyclerView.setLayoutManager(layoutManager);

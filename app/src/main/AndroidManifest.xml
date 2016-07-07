@@ -19,7 +19,8 @@
         </activity>
         <activity android:name=".ResultsActivity" />
         <activity android:name=".PreviewDetailActivity" />
-        <activity android:name=".PreviewListActivity"></activity>
+        <activity android:name=".MovieListActivity" />
+        <activity android:name=".MovieDetailActivity"></activity>
     </application>
 
 </manifest>

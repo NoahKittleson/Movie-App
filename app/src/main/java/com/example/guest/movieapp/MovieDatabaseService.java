@@ -6,12 +6,6 @@ package com.example.guest.movieapp;
 
 
 
-import android.provider.SyncStateContract;
-import android.util.Log;
-
-import com.example.guest.movieapp.Constants;
-import com.example.guest.movieapp.Preview;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,11 +15,9 @@ import java.util.ArrayList;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import se.akerfeldt.okhttp.signpost.OkHttpOAuthConsumer;
 
 public class MovieDatabaseService {
 
@@ -43,7 +35,6 @@ public class MovieDatabaseService {
 //        String url = urlBuilder.build().toString();
 
         String APICall = "https://api.themoviedb.org/3/search/movie?query=" + title + "&api_key=" + Constants.apiKey;
-        Log.d("MOVIEDBSERVIE", APICall);
 
         Request request = new Request.Builder()
                 .url(APICall)
@@ -52,11 +43,47 @@ public class MovieDatabaseService {
         Call call = client.newCall(request);
         call.enqueue(callback);
 
-        //Log.d("something", APICall);
     }
 
-    public static ArrayList<Preview> processResults(Response response) {
-        ArrayList<Preview> previews = new ArrayList<>();
+    public static void ratedMovie(Callback callback) {
+        String API_KEY = Constants.apiKey;
+
+        OkHttpClient client = new OkHttpClient.Builder()
+                .build();
+
+
+        String APICall = "https://api.themoviedb.org/3/discover/movie?primary_release_date.gte=2000-01-01&primary_release_date.lte=2020-01-01&sort_by=vote_average.desc&api_key=" + Constants.apiKey;
+
+        Request request = new Request.Builder()
+                .url(APICall)
+                .build();
+
+        Call call = client.newCall(request);
+        call.enqueue(callback);
+
+    }
+
+    public static void recentMovie(Callback callback) {
+        String API_KEY = Constants.apiKey;
+
+        OkHttpClient client = new OkHttpClient.Builder()
+                .build();
+
+
+        String APICall = "https://api.themoviedb.org/3/discover/movie?primary_release_date.gte=2016-07-01&primary_release_date.lte=2016-08-01&api_key=" + Constants.apiKey;
+
+        Request request = new Request.Builder()
+                .url(APICall)
+                .build();
+
+        Call call = client.newCall(request);
+        call.enqueue(callback);
+
+    }
+
+
+    public static ArrayList<Movie> processResults(Response response) {
+        ArrayList<Movie> movies = new ArrayList<>();
 
         try {
             String jsonData = response.body().string();
@@ -68,21 +95,15 @@ public class MovieDatabaseService {
                 for (int i = 0; i < movieJSON.length(); i++) {
                     JSONObject filmJSON = movieJSON.getJSONObject(i);
                     String title = filmJSON.getString("title");
-                    Log.d("MOVIEDBSERVIE", title + "");
                     String date = filmJSON.getString("release_date");
-                    Log.d("MOVIEDBSERVIE", date + "");
+                    String year = date.substring(0, 4);
                     int id = filmJSON.getInt("id");
-                    Log.d("MOVIEDBSERVIE", id + "");
-                    double rating = 0.0;//filmJSON.getDouble("rating");
-                    Log.d("MOVIEDBSERVIE", rating + "");
+                    double rating = filmJSON.getDouble("vote_average");
+                    String synopsis = filmJSON.getString("overview");
+                    String poster = filmJSON.getString("poster_path");
 
-                    Preview preview = new Preview(title, date, rating, id);
-                    previews.add(preview);
-
-                    Log.d("MOVIEDBSERVIE", previews.get(i).getTitle() + "");
-                    Log.d("MOVIEDBSERVIE", previews.get(i).getDate() + "");
-                    Log.d("MOVIEDBSERVIE", previews.get(i).getId() + "");
-                    Log.d("MOVIEDBSERVIE", previews.get(i).getRating() + "");
+                    Movie movie = new Movie(title, year, rating, id, synopsis, poster);
+                    movies.add(movie);
                 }
             }
         } catch (IOException e) {
@@ -90,6 +111,6 @@ public class MovieDatabaseService {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return previews;
+        return movies;
     }
 }

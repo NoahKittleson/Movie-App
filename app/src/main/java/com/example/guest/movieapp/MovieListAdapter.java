@@ -12,11 +12,6 @@ import android.view.ViewGroup;
 import android.view.View;
 import android.widget.TextView;
 
-import com.example.guest.movieapp.R;
-import com.example.guest.movieapp.Preview;
-import com.example.guest.movieapp.PreviewDetailActivity;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import org.parceler.Parcels;
@@ -24,30 +19,30 @@ import org.parceler.Parcels;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class PreviewListAdapter extends RecyclerView.Adapter<PreviewListAdapter.PreviewViewHolder> {
-    private ArrayList<Preview> mPreviews;
+public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.PreviewViewHolder> {
+    private ArrayList<Movie> mMovies;
     private Context mContext;
 
-    public PreviewListAdapter(Context context, ArrayList<Preview> previews) {
+    public MovieListAdapter(Context context, ArrayList<Movie> movies) {
         mContext = context;
-        mPreviews = previews;
+        mMovies = movies;
     }
 
     @Override
-    public PreviewListAdapter.PreviewViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MovieListAdapter.PreviewViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.preview_list_item, parent, false);
         PreviewViewHolder viewHolder = new PreviewViewHolder(view);
         return viewHolder;
     }
 
     @Override
-    public void onBindViewHolder(PreviewListAdapter.PreviewViewHolder holder, int position) {
-        holder.bindPreview(mPreviews.get(position));
+    public void onBindViewHolder(MovieListAdapter.PreviewViewHolder holder, int position) {
+        holder.bindPreview(mMovies.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return mPreviews.size();
+        return mMovies.size();
     }
 
     public class PreviewViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -65,18 +60,18 @@ public class PreviewListAdapter extends RecyclerView.Adapter<PreviewListAdapter.
 
         @Override
         public void onClick(View v) {
+
             int itemPosition = getLayoutPosition();
             Intent intent = new Intent(mContext, PreviewDetailActivity.class);
-            intent.putExtra("position", itemPosition + "");
-            intent.putExtra("previews", Parcels.wrap(mPreviews));
+            intent.putExtra("movie", Parcels.wrap(mMovies.get(itemPosition)));
+            Log.d("MovieListAdapy", mMovies.get(itemPosition).getTitle());
             mContext.startActivity(intent);
         }
 
-        public void bindPreview(Preview preview) {
-            Log.d("PreviewListAdapter", preview.getTitle() + "");
-            mTitleTextView.setText(preview.getTitle());
-            mDateTextView.setText(preview.getDate());
-            mRatingTextView.setText(preview.getRating() + "/10");
+        public void bindPreview(Movie movie) {
+            mTitleTextView.setText(movie.getTitle());
+            mDateTextView.setText(movie.getDate());
+            mRatingTextView.setText(movie.getRating() + "/10");
         }
     }
 

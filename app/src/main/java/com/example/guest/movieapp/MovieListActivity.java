@@ -3,22 +3,16 @@ package com.example.guest.movieapp;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
-
-import com.example.guest.movieapp.R;
-import com.example.guest.movieapp.PreviewListAdapter;
-import com.example.guest.movieapp.Preview;
 
 import java.util.ArrayList;
 
-import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class PreviewListActivity extends AppCompatActivity {
+public class MovieListActivity extends AppCompatActivity {
     //@Bind(R.id.recyclerView) RecyclerView mRecyclerView;
-    private PreviewListAdapter mAdapter;
+    private MovieListAdapter mAdapter;
 
-    public ArrayList<Preview> mPreviews = new ArrayList<>();
+    public ArrayList<Movie> mMovies = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
